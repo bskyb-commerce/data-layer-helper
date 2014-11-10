@@ -110,13 +110,27 @@ helper.DataLayerHelper = function(dataLayer, opt_listener, opt_listenToPast) {
   // Process the existing/past states.
   this.processStates_(dataLayer, !opt_listenToPast);
 
+  if (window['dataLayerHelpers'] === undefined) {
+    window['dataLayerHelpers'] = [];
+  }
+
+  window['dataLayerHelpers'].push(this);
+
   // Add listener for future state changes.
   var oldPush = dataLayer.push;
-  var that = this;
+
   dataLayer.push = function() {
     var states = [].slice.call(arguments, 0);
     var result = oldPush.apply(dataLayer, states);
-    that.processStates_(states);
+
+    var i;
+    for (i = 0; i < window['dataLayerHelpers'].length; i++) {
+      var listener = window['dataLayerHelpers'][i];
+      listener.processStates_(states);
+    }
+
+    console.log('data layer push method called', this);
+
     return result;
   };
 };
