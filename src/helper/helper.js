@@ -129,8 +129,6 @@ helper.DataLayerHelper = function(dataLayer, opt_listener, opt_listenToPast) {
       listener.processStates_(states);
     }
 
-    console.log('data layer push method called', this);
-
     return result;
   };
 };
