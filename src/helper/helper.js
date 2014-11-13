@@ -148,8 +148,27 @@ helper.DataLayerHelper.prototype['get'] = function(key) {
   var target = this.model_;
   var split = key.split('.');
   for (var i = 0; i < split.length; i++) {
-    if (target[split[i]] === undefined) return undefined;
-    target = target[split[i]];
+
+    var splitPart = split[i];
+
+    if (splitPart.indexOf('[') !== -1) {
+      var arrayIndex = splitPart.split('[')[1].replace(']', '');
+
+      var arrayName = splitPart.split('[')[0];
+
+      var array = target[arrayName];
+
+      if (array === undefined) return undefined;
+
+      target = array[parseInt(arrayIndex)];
+
+      if (target === undefined) return undefined;
+
+    } else {
+      if (target[splitPart] === undefined) return undefined;
+
+      target = target[splitPart];
+    }
   }
   return target;
 };
