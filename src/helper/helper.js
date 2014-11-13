@@ -151,25 +151,27 @@ helper.DataLayerHelper.prototype['get'] = function(key) {
 
     var splitPart = split[i];
 
-    if (splitPart.indexOf('[') !== -1) {
-      var arrayIndex = splitPart.split('[')[1].replace(']', '');
+    if (target[splitPart] === undefined) return undefined;
 
-      var arrayName = splitPart.split('[')[0];
+    target = target[splitPart];
 
-      var array = target[arrayName];
+    /*
+      This code will use the last array element if the encountered variable
+      is an Array, but this is not the last part to be processed. This is
+      implemented so for example if you want an attribute from an array called
+      event then you code just do event.attribute_name which would give you
+      attribute_name from the last element in the array
+    */
+    if ((i < (split.length - 1)) && target instanceof Array) {
 
-      if (array === undefined) return undefined;
+      if (target.length === 0) {
+        return undefined;
+      }
 
-      target = array[parseInt(arrayIndex)];
-
-      if (target === undefined) return undefined;
-
-    } else {
-      if (target[splitPart] === undefined) return undefined;
-
-      target = target[splitPart];
+      target = target.pop();
     }
   }
+
   return target;
 };
 
