@@ -168,7 +168,7 @@ helper.DataLayerHelper.prototype['get'] = function(key) {
         return undefined;
       }
 
-      target = target.pop();
+      target = target[target.length - 1];
     }
   }
 
