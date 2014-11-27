@@ -117,11 +117,11 @@ helper.DataLayerHelper = function(dataLayer, opt_listener, opt_listenToPast) {
   window['dataLayerHelpers'].push(this);
 
   // Add listener for future state changes.
-  var oldPush = dataLayer.push;
+  var nativePush = [].push;
 
   dataLayer.push = function() {
     var states = [].slice.call(arguments, 0);
-    var result = oldPush.apply(dataLayer, states);
+    var result = nativePush.apply(dataLayer, states);
 
     var i;
     for (i = 0; i < window['dataLayerHelpers'].length; i++) {
