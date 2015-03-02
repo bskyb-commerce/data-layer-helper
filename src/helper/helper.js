@@ -159,7 +159,7 @@ helper.DataLayerHelper.prototype['get'] = function(key) {
       This code will use the last array element if the encountered variable
       is an Array, but this is not the last part to be processed. This is
       implemented so for example if you want an attribute from an array called
-      event then you code just do event.attribute_name which would give you
+      event then you could just do event.attribute_name which would give you
       attribute_name from the last element in the array
     */
     if ((i < (split.length - 1)) && target instanceof Array) {
@@ -279,6 +279,18 @@ helper.processCommand_ = function(command, model) {
   var args = command.slice(1);
   var target = model;
   for (var i = 0; i < path.length; i++) {
+    /*
+      This code will change an attribute on the last array element if the
+      encountered parent variable is an Array. This is implemented so for example
+      if you want to change an attribute on the last item in an array called
+      event then you could just use event.attribute_name which would change the
+      value of the attribute_name on the last element in the event array.
+    */
+    if (target instanceof Array) {
+      if (target.length === 0) return;
+      target = target[target.length - 1];
+    }
+
     if (target[path[i]] === undefined) return;
     target = target[path[i]];
   }

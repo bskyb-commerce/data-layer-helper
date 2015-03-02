@@ -137,6 +137,19 @@ test('Advanced Operations', function() {
         }
       };
       dataLayer.push(method);
-    })
+    });
   ok(helper.get('numCustomMethodCalls') === 10);
+});
+
+test('Update Array Operations', function() {
+  var dataLayer = [];
+  var helper = new DataLayerHelper(dataLayer);
+
+  // Should update the attribute for the last item of an array and check
+  // that it has been updated using the get function on the updated array.
+  dataLayer.push({a: [{'segment': 'vanilla'}]});
+  ok(helper.get('a.segment') === 'vanilla');
+
+  dataLayer.push({'a.segment': 'prospect'});
+  ok(helper.get('a.segment') === 'prospect');
 });
