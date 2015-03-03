@@ -162,7 +162,7 @@ helper.DataLayerHelper.prototype['get'] = function(key) {
       event then you could just do event.attribute_name which would give you
       attribute_name from the last element in the array
     */
-    if ((i < (split.length - 1)) && target instanceof Array) {
+    if ((i < (split.length - 1)) && helper.isArray_(target)) {
 
       if (target.length === 0) {
         return undefined;
@@ -279,18 +279,6 @@ helper.processCommand_ = function(command, model) {
   var args = command.slice(1);
   var target = model;
   for (var i = 0; i < path.length; i++) {
-    /*
-      This code will change an attribute on the last array element if the
-      encountered parent variable is an Array. This is implemented so for example
-      if you want to change an attribute on the last item in an array called
-      event then you could just use event.attribute_name which would change the
-      value of the attribute_name on the last element in the event array.
-    */
-    if (target instanceof Array) {
-      if (target.length === 0) return;
-      target = target[target.length - 1];
-    }
-
     if (target[path[i]] === undefined) return;
     target = target[path[i]];
   }
@@ -325,7 +313,34 @@ helper.expandKeyValue_ = function(key, value) {
   var target = result;
   var split = key.split('.');
   for (var i = 0; i < split.length - 1; i++) {
-    target = target[split[i]] = {};
+
+    var splitPart = split[i];
+
+    var arraySplit = splitPart.split('[');
+    if (arraySplit.length > 1) {
+
+      /*
+        This code will cause a change to an attribute on an array element, if an
+        index of an element is specified. This is implemented so for example
+        if you want to change an attribute on the second item in an array called
+        event then you could just use event[1].attribute_name which would change
+        the value of the attribute_name on the second element in the event array
+        without effecting the other values.
+      */
+
+      var arrayIndex = parseInt(arraySplit[1].replace(']', ''), 10);
+      var arrayName = arraySplit[0];
+
+      var array = target[arrayName] = [];
+
+      for (var j = 0; j < arrayIndex + 1; j++) {
+        target = array[j] = {};
+      }
+
+    } else {
+      target = target[splitPart] = {};
+    }
+
   }
   target[split[split.length - 1]] = value;
   return result;

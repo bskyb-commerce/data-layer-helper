@@ -52,5 +52,8 @@ test('expandKeyValue_', function() {
   assertExpand('a..b', 2, {a: {'': {b: 2}}});
   assertExpand('a', {'b.c': 1}, {a: {'b.c': 1}});
   assertExpand('a.b', {'b.c': 1}, {a: {b: {'b.c': 1}}});
+
+  assertExpand('a[0].segment', 'vanilla', {a: [{'segment' : 'vanilla'}]});
+  assertExpand('a[1].segment', 'prospect', {a: [{}, {'segment' : 'prospect'}]});
 });
 

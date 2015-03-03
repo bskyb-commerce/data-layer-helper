@@ -147,9 +147,16 @@ test('Update Array Operations', function() {
 
   // Should update the attribute for the last item of an array and check
   // that it has been updated using the get function on the updated array.
-  dataLayer.push({a: [{'segment': 'vanilla'}]});
+  dataLayer.push({a: [{'segment': 'vanilla', 'x': 'y'}]});
   ok(helper.get('a.segment') === 'vanilla');
 
-  dataLayer.push({'a.segment': 'prospect'});
-  ok(helper.get('a.segment') === 'prospect');
+  dataLayer.push({'a[0].segment': 'prospect'});
+  deepEqual(helper.get('a'), [{'segment': 'prospect', 'x': 'y'}]);
+
+  // Test the same functionality on an array containing more than one item.
+  dataLayer.push({b: [{'segment': 'vanilla1'}, {'segment': 'vanilla2'}]});
+  ok(helper.get('b.segment') === 'vanilla2');
+
+  dataLayer.push({'b[1].segment': 'prospect2'});
+  deepEqual(helper.get('b'), [{'segment': 'vanilla1'}, {'segment': 'prospect2'}]);
 });
