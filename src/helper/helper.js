@@ -114,7 +114,19 @@ helper.DataLayerHelper = function(dataLayer, opt_listener, opt_listenToPast) {
     window['dataLayerHelpers'] = [];
   }
 
-  window['dataLayerHelpers'].push(this);
+  var relevantDataLayerHandlers = helper.getHandlersFor_(dataLayer);
+
+  if (this.relevantDataLayerHandlers_) {
+    relevantDataLayerHandlers.push(this);
+  } else {
+    window['dataLayerHelpers'].push({
+      dataLayerInstance: dataLayer,
+      handlers: [this]
+    });
+
+    relevantDataLayerHandlers = helper.getHandlersFor_(dataLayer);
+  }
+
 
   // Add listener for future state changes.
   var nativePush = [].push;
@@ -123,11 +135,9 @@ helper.DataLayerHelper = function(dataLayer, opt_listener, opt_listenToPast) {
     var states = [].slice.call(arguments, 0);
     var result = nativePush.apply(dataLayer, states);
 
-    var i;
-    for (i = 0; i < window['dataLayerHelpers'].length; i++) {
-      var listener = window['dataLayerHelpers'][i];
-      listener.processStates_(states);
-    }
+    relevantDataLayerHandlers.forEach(function(handler) {
+      handler.processStates_(states);
+    });
 
     return result;
   };
@@ -187,6 +197,23 @@ helper.DataLayerHelper.prototype['flatten'] = function() {
   this.dataLayer_.splice(0, this.dataLayer_.length);
   this.dataLayer_[0] = {};
   helper.merge_(this.model_, this.dataLayer_[0]);
+};
+
+
+/**
+ * Returns the handlers 'registered' against a dataLayer instance
+ *
+ * @param {Array} dataLayer instance.
+ * @return {*} The interface to the abstract data layer model that is given
+ *     to Custom Methods.
+ * @private
+ */
+helper.getHandlersFor_ = function(dataLayer) {
+  return window['dataLayerHelpers'].filter(function(dataLayerHelper) {
+    return dataLayerHelper.dataLayerInstance === dataLayer;
+  }).reduce(function(accumulator, current) {
+    return current.handlers || accumulator;
+  }, null);
 };
 
 
